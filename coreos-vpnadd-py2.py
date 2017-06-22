@@ -11,6 +11,7 @@ net='^(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9]?[0-9])(\.(2[0-4][0-9]|25[0-5]|1[0-9
 ip_range='^(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9]?[0-9])(\.(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9]?[0-9])){3}-(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9]?[0-9])(\.(2[0-4][0-9]|25[0-5]|1[0-9][0-9]|[1-9]?[0-9])){3}$'
 interface='enp3s0f0'
 ccd_dir='/media/root/etc/openvpn/ccd'
+vpn_netnum='2'
 os.chdir(ccd_dir)
 iptab_dir='/media/root/tmp'
 os.system('iptables -t nat -L -n|grep MASQUERADE > %s/iptables_list' % iptab_dir)
@@ -51,7 +52,7 @@ def show(args,ip_ex):
         fobj=open(f,'r')
         for i in fobj:
             r.append(f)
-            if re.match('ifconfig-push 172\.%s\.5\.\d+ \d{1,3}\.\d{1,3}\.\d{1,3}\.\d+\n' % ip_ex,i):
+            if re.match('ifconfig-push 172\.%s\.%s\.\d+ \d{1,3}\.\d{1,3}\.\d{1,3}\.\d+\n' % (ip_ex,vpn_netnum),i):
                 a[f]=i
     r.sort(key=lambda x: len(x))
     r=len(r[-1])
@@ -61,7 +62,7 @@ def getip(ip_ex,arg2):
     for f in os.listdir('.'):
         fobj=open(f,'r')
         for i in fobj.readlines():
-            if re.match('ifconfig-push 172\.%s\.5\.\d+ 172\.%s\.5\.\d+\n' % (ip_ex,ip_ex),i):
+            if re.match('ifconfig-push 172\.%s\.%s\.\d+ 172\.%s\.%s\.\d+\n' % (ip_ex,vpn_netnum,ip_ex,vpn_netnum),i):
                 if ip_ex == int(i.split('.')[-3]):
                     w=re.split(' |\.',i)[1:4]
                     i=re.split(' |\.',i)[4]
@@ -69,7 +70,7 @@ def getip(ip_ex,arg2):
                     fobj.close()
     llen=len(l)
     if llen == 0:
-        t='172.%s.5.1' % ip_ex  if arg2=='srcip' else '172.%s.5.2' % ip_ex
+        t='172.%s.%s.1' % (ip_ex,vpn_netnum)  if arg2=='srcip' else '172.%s.%s.2' % (ip_ex,vpn_netnum)
         return t
     else:
         a=sorted(l)[-1]
