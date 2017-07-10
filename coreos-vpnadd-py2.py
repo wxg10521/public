@@ -181,7 +181,8 @@ class Nav():
         except Exception as e:
            print (Exception,':',e)
     def add_user_iptab(self,user):
-        if os.path.exists(user):
+        try:
+            os.path.exists(user)
             fobj=open(user)
             s=fobj.readlines()
             fobj.close()
@@ -192,8 +193,8 @@ class Nav():
             for i in range(lend):
                 ruleip=rule_list[i]
                 edit_iptab(src_ip,ruleip,interface,'A')
-        else:
-            print ' user not exists!'
+        except Exception as e:
+            print (Exception,': %s user not exists!',e)
 def main():
     '''
     主程序
